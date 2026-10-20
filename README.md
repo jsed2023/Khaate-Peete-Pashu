@@ -18,10 +18,7 @@ Production check: `npm run build`; then `npm start`.
 - `/cart` Browser-persisted demo cart and quantity controls
 - `/about` About
 - `/contact` Contact form demo
-- `/blog` Farm journal
-- `/blog/[slug]` Article pages
-- `/faq` FAQs
-- `/shipping`, `/returns`, `/privacy` policy templates
+
 
 ## Included
 - Responsive navigation and layout
@@ -39,12 +36,4 @@ Cart checkout and payment are intentionally **not live**. Before accepting order
 
 Contact form currently confirms locally only; connect a server action/API and email/CRM provider. Add real support details, shipping/returns/privacy policies, analytics consent as appropriate, sitemap/robots, image assets and production environment variables. Have animal nutrition and veterinary claims reviewed by qualified professionals.
 
-## Suggested next phase
-- PostgreSQL + Prisma/Drizzle
-- Admin dashboard for products/orders
-- Customer accounts and order history
-- Razorpay checkout with verified webhooks
-- Product inventory and stock alerts
-- Real WhatsApp support and transactional email
-- Product image upload and optimized `next/image`
-- Tests (Playwright) and deployment
+
