@@ -29,10 +29,19 @@ export default function ProductsBrowser() {
     });
 
     return [...result].sort((a, b) => {
-      if (sort === "low") return a.price - b.price;
-      if (sort === "high") return b.price - a.price;
+      if (sort === "low") {
+        return a.price - b.price;
+      }
 
-      return Number(b.featured) - Number(a.featured);
+      if (sort === "high") {
+        return b.price - a.price;
+      }
+
+      // Featured products first
+      return (
+        Number(b.featured.length > 0) -
+        Number(a.featured.length > 0)
+      );
     });
   }, [query, sort]);
 

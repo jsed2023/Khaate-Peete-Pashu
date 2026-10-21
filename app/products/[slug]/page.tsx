@@ -1,11 +1,11 @@
-
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   ArrowLeft,
   CheckCircle2,
-  Package,
   ShieldCheck,
+  Star,
   Truck,
 } from "lucide-react";
 
@@ -24,40 +24,47 @@ export default async function ProductPage({
     notFound();
   }
 
+  const isFeatured = product.featured?.length > 0;
+
   return (
     <main className="min-h-screen bg-white text-slate-800">
       <section className="mx-auto max-w-7xl px-5 py-10 sm:px-8 sm:py-16 lg:px-10 lg:py-20">
         <div className="grid items-start gap-10 lg:grid-cols-2 lg:gap-16">
-          {/* Product Visual Panel */}
-          <div className="relative overflow-hidden rounded-3xl border border-emerald-900/5 bg-[#f3f7eb] p-6 sm:p-10">
+          {/* Product Image */}
+          <div className="relative overflow-hidden rounded-3xl border border-emerald-900/5 bg-[#f3f7eb] p-5 sm:p-8">
             <div
               aria-hidden="true"
               className="pointer-events-none absolute -right-10 -top-10 h-48 w-48 rounded-full bg-lime-300/30 blur-3xl"
             />
 
-            <div className="relative flex min-h-72 flex-col items-center justify-center rounded-2xl border border-white bg-white/70 p-8 text-center sm:min-h-96">
-              <div className="flex h-24 w-24 items-center justify-center rounded-3xl bg-[#e8f2d9] text-emerald-800 shadow-sm">
-                <Package size={48} strokeWidth={1.5} />
+            <div className="relative overflow-hidden rounded-2xl border border-white bg-white p-4 sm:p-8">
+              <div className="relative flex min-h-72 items-center justify-center sm:min-h-96">
+                <Image
+                  src={product.image}
+                  alt={`${product.name} - ${product.unit}`}
+                  width={700}
+                  height={700}
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="max-h-[420px] w-full object-contain transition-transform duration-300 hover:scale-105"
+                />
               </div>
 
-              <h2 className="mt-4 max-w-md text-2xl font-bold text-[#173b28] sm:text-3xl">
-                {product.name}
-              </h2>
+              {isFeatured && (
+                <div className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1.5 text-xs font-bold text-amber-800 shadow-sm">
+                  <Star size={14} fill="currentColor" />
+                  Featured Product
+                </div>
+              )}
 
-              <p className="mt-3 max-w-sm text-sm leading-6 text-slate-500">
-                {product.description}
-              </p>
-
-              <p className="mt-5 text-3xl font-extrabold text-[#173b28]">
-                {money(product.price)}
-              </p>
-
-              <span className="mt-1 text-sm text-slate-500">
-                {product.unit}
-              </span>
+              {product.tag && (
+                <span className="absolute bottom-3 right-3 rounded-full bg-emerald-800 px-3 py-1.5 text-xs font-semibold text-white">
+                  {product.tag}
+                </span>
+              )}
             </div>
 
-            <div className="relative mt-4 flex items-center justify-center gap-2 text-sm font-medium text-emerald-900">
+            <div className="relative mt-5 flex items-center justify-center gap-2 text-sm font-medium text-emerald-900">
               <ShieldCheck size={18} />
               Contact us to confirm availability
             </div>
@@ -99,14 +106,38 @@ export default async function ProductPage({
               </div>
             </div>
 
-            {/* Product Information Card */}
-            <div className="mt-7 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
+            {/* Featured Highlights */}
+            {isFeatured && (
+              <div className="mt-7 rounded-2xl border border-emerald-100 bg-[#f7f9f3] p-5 sm:p-6">
+                <h2 className="flex items-center gap-2 text-lg font-bold text-[#173b28]">
+                  <Star size={19} className="text-emerald-700" />
+                  Product Highlights
+                </h2>
+
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {product.featured.map((item) => (
+                    <div key={item} className="flex items-start gap-2.5">
+                      <CheckCircle2
+                        size={18}
+                        className="mt-0.5 shrink-0 text-emerald-700"
+                      />
+                      <span className="text-sm leading-6 text-slate-700">
+                        {item}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Product Details */}
+            <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 sm:p-6">
               <h2 className="text-lg font-bold text-[#173b28]">
                 Product Information
               </h2>
 
               <p className="mt-2 text-sm leading-7 text-slate-600">
-                Please contact our team to confirm product specifications,
+                Contact our team to confirm product specifications,
                 ingredients, pack sizes, current pricing and availability
                 before placing your order.
               </p>
@@ -127,7 +158,9 @@ export default async function ProductPage({
             </div>
 
             {/* Add to Cart */}
-            <AddToCart product={product} />
+            <div className="mt-7">
+              <AddToCart product={product} />
+            </div>
 
             {/* Contact Button */}
             <div className="mt-4">
