@@ -14,11 +14,26 @@ import { siteConfig } from "@/config/site";
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const { contact, socialLinks } = siteConfig;
+
+  const socials = [
+    {
+      name: "Facebook",
+      href: socialLinks.facebook,
+      Icon: Facebook,
+    },
+    {
+      name: "Instagram",
+      href: socialLinks.instagram,
+      Icon: Instagram,
+    },
+   
+  ].filter((social) => social.href.trim() !== "");
 
   return (
     <footer className="site-footer">
       <div className="footer-main">
-        {/* Brand and Logo */}
+        {/* Brand */}
         <div className="footer-about">
           <Link
             href="/"
@@ -26,7 +41,7 @@ export default function Footer() {
             aria-label={`${siteConfig.name} - Home`}
           >
             <Image
-              src="/images/logo.png"
+              src={siteConfig.logo}
               alt={`${siteConfig.name} logo`}
               width={48}
               height={48}
@@ -37,79 +52,72 @@ export default function Footer() {
             <span>{siteConfig.name}</span>
           </Link>
 
-          <p>
-            Animal nutrition, cattle feed and farm essentials
-            to support healthier livestock and better farming.
-          </p>
+          <p>{siteConfig.footerDescription}</p>
 
-          {/* Social Links */}
-          <div className="footer-socials">
-            <a
-              href="https://www.facebook.com/khaatepeetepashu's"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Visit us on Facebook"
-            >
-              <Facebook size={18} aria-hidden="true" />
-            </a>
-
-            <a
-              href="https://www.instagram.com/khaatepeetepashu"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Visit Instagram"
-            >
-              <Instagram size={18} aria-hidden="true" />
-            </a>
-          </div>
+          {/* Social Media */}
+          {socials.length > 0 && (
+            <div className="footer-socials">
+              {socials.map(({ name, href, Icon }) => (
+                <a
+                  key={name}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Visit us on ${name}`}
+                >
+                  <Icon size={18} aria-hidden="true" />
+                </a>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Quick Links */}
-        <nav className="footer-column" aria-label="Footer navigation">
+        <nav
+          className="footer-column"
+          aria-label="Footer navigation"
+        >
           <h3>Quick Links</h3>
 
-          <Link href="/">
-            Home <ArrowUpRight size={14} aria-hidden="true" />
-          </Link>
-          <Link href="/products">
-            All Products <ArrowUpRight size={14} aria-hidden="true" />
-          </Link>
-          <Link href="/about">
-            About Us <ArrowUpRight size={14} aria-hidden="true" />
-          </Link>
-          <Link href="/contact">
-            Contact Us <ArrowUpRight size={14} aria-hidden="true" />
-          </Link>
+          {siteConfig.footerLinks.map((item) => (
+            <Link key={item.href} href={item.href}>
+              <span>{item.label}</span>
+              <ArrowUpRight size={14} aria-hidden="true" />
+            </Link>
+          ))}
         </nav>
 
-        {/* Contact Information */}
+        {/* Contact */}
         <div className="footer-column footer-contact">
           <h3>Contact Us</h3>
 
           <a
-            href="https://www.google.com/maps/search/?api=1&query=Haripura%2C+Sangaria%2C+Hanumangarh%2C+Rajasthan+335063"
+            href={contact.mapUrl}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="View our address on Google Maps"
           >
             <MapPin size={18} aria-hidden="true" />
-            <span>
-              Village Haripura, Sangaria,
-              <br />
-              Hanumangarh, Rajasthan, India
-              <br />
-              335063
-            </span>
+            <span>{contact.address}</span>
           </a>
 
-          <a href="tel:+919783002446">
+          <a href={`tel:${contact.phone}`}>
             <Phone size={18} aria-hidden="true" />
-            <span>+91 97830 02446</span>
+            <span>{contact.phoneDisplay}</span>
           </a>
 
-          <a href="mailto:srishayamagrocattlefeeds@gmail.com">
+          <a href={`mailto:${contact.email}`}>
             <Mail size={18} aria-hidden="true" />
-            <span>srishayamagrocattlefeeds@gmail.com</span>
+            <span>{contact.email}</span>
+          </a>
+
+          <a
+            href={`https://wa.me/${siteConfig.whatsappNumber}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Phone size={18} aria-hidden="true" />
+            <span>Chat with us on WhatsApp</span>
           </a>
         </div>
       </div>
@@ -120,9 +128,7 @@ export default function Footer() {
           © {year} {siteConfig.name}. All rights reserved.
         </p>
 
-        <p>
-          Better nutrition. Healthier livestock. Better farming.
-        </p>
+        <p>{siteConfig.footerTagline}</p>
       </div>
     </footer>
   );
