@@ -57,7 +57,7 @@ export const products: Product[] = [
   price: 1250,
   unit: "50 kg bag",
   emoji: "🌾",
-  image: "/images/products/mustard-gold.webp",
+  image: "/images/products/Mustard-Gold.webp",
   tag: "Popular",
   description:
     "Mustard Gold cattle feed by Khaate Peete Pashu (KPP), marketed by Shree Shyam Agro Cattle Feed.",
