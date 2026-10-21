@@ -83,7 +83,7 @@ export const siteConfig = {
   ] satisfies FooterLink[],
 
   socialLinks: {
-    facebook: "https://www.facebook.com/KhaatePeetePashus",
+    facebook: "https://www.facebook.com/khaatepeetepashus",
     instagram: "https://www.instagram.com/khaate_peete_pashu/",
   } satisfies SocialLinks,
 
