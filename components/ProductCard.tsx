@@ -39,11 +39,12 @@ export default function ProductCard({
           <Image
             src={product.image}
             alt={`${product.name} - ${product.unit}`}
-            width={600}
+            width={500}
             height={450}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="h-56 w-full object-contain transition-transform duration-300 hover:scale-105"
             placeholder="empty"
+            loading="eager"
           />
         </div>
       </Link>
