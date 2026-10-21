@@ -32,7 +32,10 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
-
+// Google verification yahan add karein 👇
+  verification: {
+    google: "rY6SzNFyVITWqic5zrmNVWkSM0MZJeXKBD7tZLTLTmw",
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
