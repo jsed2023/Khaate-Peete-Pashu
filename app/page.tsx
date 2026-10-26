@@ -80,7 +80,7 @@ export default function HomePage() {
               <span className="text-green-700 dark:text-green-400">
                 Animal Nutrition
               </span>{" "}
-              Cattale feed
+              Cattle feed
             </h1>
 
             <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600 dark:text-slate-300 sm:text-lg">
@@ -206,28 +206,27 @@ export default function HomePage() {
                   key={product.id}
                   className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-green-200 hover:shadow-xl hover:shadow-green-950/5 dark:border-white/10 dark:bg-[#17251b] dark:hover:border-green-900"
                 >
-                  {/* Product Image */}
-                  <Link
-                    href={`/products/${product.slug}`}
-                    aria-label={`View ${product.name}`}
-                    className="relative flex h-56 items-center justify-center overflow-hidden bg-[#f3f7eb] p-5 dark:bg-[#101b14]"
-                  >
-                    <Image
-                      src={product.image}
-                      alt={product.name}
-                      width={400}
-                      height={400}
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="h-full w-full object-contain transition duration-300 group-hover:scale-105"
-                    />
+                  {/* Product Image */}           
+<Link
+  href={`/products/${product.slug}`}
+  aria-label={`View ${product.name}`}
+  className="group relative flex h-56 items-center justify-center overflow-hidden bg-transparent p-5"
+>
+  <Image
+    src={product.image}
+    alt={product.name}
+    width={400}
+    height={300}
+    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+    className="h-full w-full object-contain transition duration-300 group-hover:scale-105"
+  />
 
-                    {product.tag && (
-                      <span className="absolute left-4 top-4 rounded-full bg-green-700 px-3 py-1 text-xs font-semibold text-white shadow-sm">
-                        {product.tag}
-                      </span>
-                    )}
-                  </Link>
-
+  {product.tag && (
+    <span className="absolute left-4 top-4 rounded-full bg-green-700 px-3 py-1 text-xs font-semibold text-white shadow-sm">
+      {product.tag}
+    </span>
+  )}
+</Link>
                   {/* Product Information */}
                   <div className="flex flex-1 flex-col p-6">
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">

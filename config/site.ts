@@ -73,6 +73,7 @@ export const siteConfig = {
         })),
     },
     { label: "Contact Us", href: "/contact" },
+    { label: "Cart", href: "/cart" },
   ] satisfies SiteNavItem[],
 
   footerLinks: [

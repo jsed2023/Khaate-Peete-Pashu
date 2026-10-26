@@ -1056,3 +1056,6 @@ html.dark .mobile-menu-btn {
     display: flex;
   }
 }
+.product-art {
+  background: transparent !important;
+}

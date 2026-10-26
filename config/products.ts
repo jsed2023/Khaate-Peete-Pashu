@@ -223,7 +223,7 @@ export const products: Product[] = [
   slug: "corral-milkup",
   name: "Corral Milkup",
   category: "Cattle Feed",
-  price: 1470,
+  price: 1570,
   unit: "50 kg bag",
   emoji: "🐄",
   image: "/images/products/corral-milkup.webp",
@@ -260,7 +260,7 @@ export const products: Product[] = [
   slug: "corral-dairy-power",
   name: "Corral Dairy Power",
   category: "Cattle Feed",
-  price: 1540, // Replace with actual selling price
+  price: 1640, // Replace with actual selling price
   unit: "50 kg bag",
   emoji: "🐄",
   image: "/images/products/corral-dairy-power.webp",
@@ -299,7 +299,7 @@ export const products: Product[] = [
   slug: "corral-8000",
   name: "Corral 8000",
   category: "Cattle Feed",
-  price: 1680, // Replace with actual selling price
+  price: 1780, // Replace with actual selling price
   unit: "50 kg bag", // Confirm actual pack size
   emoji: "🐄",
   image: "/images/products/corral-8000.webp",

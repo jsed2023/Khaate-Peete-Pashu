@@ -1,3 +1,4 @@
+
 "use client";
 
 import Image from "next/image";
@@ -22,9 +23,9 @@ export default function ProductCard({
         href={`/products/${product.slug}`}
         aria-label={`View ${product.name} details`}
       >
-        <div className="product-art relative overflow-hidden">
+        <div className="product-art group relative flex h-56 items-center justify-center overflow-hidden bg-transparent">
           {product.tag && (
-            <span className="product-tag">
+            <span className="product-tag absolute left-3 top-3 z-10">
               {product.tag}
             </span>
           )}
@@ -42,7 +43,7 @@ export default function ProductCard({
             width={500}
             height={450}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="h-56 w-full object-contain transition-transform duration-300 hover:scale-105"
+            className="h-full w-full object-contain bg-transparent transition-transform duration-300 group-hover:scale-105"
             placeholder="empty"
             loading="eager"
           />
@@ -75,10 +76,7 @@ export default function ProductCard({
               {money(product.price)}
             </div>
 
-            <span
-              className="muted"
-              style={{ fontSize: 11 }}
-            >
+            <span className="muted" style={{ fontSize: 11 }}>
               {product.unit}
             </span>
           </div>
@@ -89,10 +87,7 @@ export default function ProductCard({
             aria-label={`Add ${product.name} to cart`}
             onClick={() => add(product)}
           >
-            <ShoppingCart
-              size={17}
-              aria-hidden="true"
-            />
+            <ShoppingCart size={17} aria-hidden="true" />
           </button>
         </div>
       </div>
