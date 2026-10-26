@@ -218,6 +218,124 @@ export const products: Product[] = [
   ],
   active: true,
 },
+{
+  id: "p7",
+  slug: "corral-milkup",
+  name: "Corral Milkup",
+  category: "Cattle Feed",
+  price: 1470,
+  unit: "50 kg bag",
+  emoji: "🐄",
+  image: "/images/products/corral-milkup.webp",
+  tag: "Popular",
+  description:
+    "Corral Milkup is a balanced cattle feed formulated for dairy cows producing 15–20 litres of milk per day. It provides a balanced combination of energy, protein, fat, fibre, vitamins, and minerals to support daily nutrition and milk production.",
+  details: [
+    "Balanced cattle feed for dairy cows",
+    "Designed for cows producing 15–20 litres of milk per day",
+    "Provides energy, protein, fat, fibre, vitamins, and minerals",
+    "Supports daily nutritional requirements",
+    "Store in a cool, dry place",
+    "Follow recommended feeding guidelines",
+  ],
+  keywords: [
+    "Corral Milkup",
+    "Corral Milkup price",
+    "Corral Milkup cattle feed",
+    "dairy cattle feed",
+    "cattle feed for milk production",
+    "cattle nutrition",
+  ],
+  featured: [
+    "Balanced Nutrition",
+    "Dairy Cattle Feed",
+    "Energy & Protein",
+    "Vitamins & Minerals",
+  ],
+  active: true,
+},
+
+{
+  id: "p8",
+  slug: "corral-dairy-power",
+  name: "Corral Dairy Power",
+  category: "Cattle Feed",
+  price: 1540, // Replace with actual selling price
+  unit: "50 kg bag",
+  emoji: "🐄",
+  image: "/images/products/corral-dairy-power.webp",
+  tag: "High Yield",
+  description:
+    "Corral Dairy Power is a step-up milking feed for cows producing 20–25 litres of milk per day. It delivers additional energy density and quality protein to support higher milk production while helping maintain fertility and body condition.",
+  details: [
+    "Step-up milking feed for dairy cows",
+    "Designed for cows producing 20–25 litres of milk per day",
+    "Provides additional energy density",
+    "Quality protein to support higher milk production",
+    "Formulated to help maintain fertility and body condition",
+    "Pack size: 50 kg",
+    "Store in a cool, dry place",
+    "Follow recommended feeding guidelines",
+  ],
+  keywords: [
+    "Corral Dairy Power",
+    "Corral Dairy Power price",
+    "Corral Dairy Power 50 kg",
+    "dairy cattle feed",
+    "cattle feed for 20–25 litres milk",
+    "high yield milking feed",
+  ],
+  featured: [
+    "High-Yield Dairy Feed",
+    "Enhanced Energy",
+    "Quality Protein",
+    "Fertility & Body Condition Support",
+  ],
+  active: true,
+},
+
+{
+  id: "p9",
+  slug: "corral-8000",
+  name: "Corral 8000",
+  category: "Cattle Feed",
+  price: 1680, // Replace with actual selling price
+  unit: "50 kg bag", // Confirm actual pack size
+  emoji: "🐄",
+  image: "/images/products/corral-8000.webp",
+  tag: "Premium",
+  description:
+    "Built for high-yield cows producing 25–30 litres of milk daily. Corral 8000 is a flagship milking feed designed to support peak lactation with quality protein, bypass nutrients, vitamins, chelated minerals, and yeast for rumen efficiency.",
+  details: [
+    "Flagship milking feed for high-yield dairy cows",
+    "Designed for cows producing 25–30 litres of milk per day",
+    "Focuses on optimal protein quality",
+    "Includes bypass nutrients, as described for the product",
+    "Contains vitamins and chelated minerals",
+    "Includes yeast to support rumen efficiency",
+    "Store in a cool, dry place",
+    "Follow recommended feeding guidelines",
+  ],
+  keywords: [
+    "Corral 8000",
+    "Corral 8000 price",
+    "Corral 8000 cattle feed",
+    "high-yield dairy cattle feed",
+    "cattle feed for 25–30 litres milk",
+    "premium milking feed",
+    "bypass nutrients",
+    "rumen efficiency",
+  ],
+  featured: [
+    "High-Yield Dairy Feed",
+    "Quality Protein",
+    "Bypass Nutrients",
+    "Vitamins & Chelated Minerals",
+    "Rumen Efficiency Support",
+  ],
+  active: true,
+},
+
 ];
 
 export const activeProducts = products.filter(
