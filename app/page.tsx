@@ -78,20 +78,18 @@ export default function HomePage() {
             <h1 className="mt-6 max-w-4xl text-4xl font-extrabold leading-tight tracking-tight text-slate-900 dark:text-white sm:text-5xl lg:text-6xl">
               Quality{" "}
               <span className="text-green-700 dark:text-green-400">
-                Cattle Feed & Pashu Aahar
+                Animal Nutrition
               </span>{" "}
-              for Dairy Farming
+              Cattale feed
             </h1>
 
             <p className="mt-6 max-w-2xl text-base leading-8 text-slate-600 dark:text-slate-300 sm:text-lg">
-              Explore cattle feed, animal nutrition and
-              livestock feed products from Khaate Peete Pashu,
-              based in Sangaria, Hanumangarh, Rajasthan.
-              Discover Calf Starter, Heifer Dry, Cattle Gold,
-              Mustard Gold and Binola Khal. View product
-              details, compare available pack sizes and
-              contact our team for pricing, availability
-              and delivery enquiries.
+              Explore cattle feed, animal nutrition and livestock 
+              feed products from Khaate Peete Pashu, based in Sangaria,
+               Hanumangarh, Rajasthan. Calf Starter, Corral feeds, Heifer Dry,
+                Cattle Gold, Mustard Gold and Binola Khal. View product details, 
+                compare available pack sizes and contact our team 
+                for pricing, availability and delivery enquiries.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-4">
@@ -146,7 +144,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Benefits Section - Unchanged */}
+      {/* Benefits Section */}
       <section className="border-y border-slate-100 bg-white dark:border-white/10 dark:bg-[#121d16]">
         <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 sm:grid-cols-2 sm:px-6 lg:grid-cols-3 lg:px-8">
           {benefits.map(({ title, description, icon: Icon }) => (
@@ -182,16 +180,13 @@ export default function HomePage() {
               </p>
 
               <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-                Our Cattle Feed & Animal Nutrition Products
+                Featured Products
               </h2>
 
               <p className="mt-4 max-w-2xl leading-7 text-slate-600 dark:text-slate-300">
-                Browse our range of cattle feed and pashu
-                aahar products for dairy farming and livestock
-                nutrition. Explore Calf Starter, Heifer Dry,
-                Cattle Gold, Mustard Gold and Binola Khal, and
-                contact us to confirm product specifications,
-                pack sizes, current prices and availability.
+                Explore our available products, view pack sizes
+                and prices, and visit individual product pages
+                for further information.
               </p>
             </div>
 
@@ -211,6 +206,7 @@ export default function HomePage() {
                   key={product.id}
                   className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:border-green-200 hover:shadow-xl hover:shadow-green-950/5 dark:border-white/10 dark:bg-[#17251b] dark:hover:border-green-900"
                 >
+                  {/* Product Image */}
                   <Link
                     href={`/products/${product.slug}`}
                     aria-label={`View ${product.name}`}
@@ -232,6 +228,7 @@ export default function HomePage() {
                     )}
                   </Link>
 
+                  {/* Product Information */}
                   <div className="flex flex-1 flex-col p-6">
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                       <Link
@@ -246,6 +243,7 @@ export default function HomePage() {
                       {product.description}
                     </p>
 
+                    {/* Price and Unit */}
                     <div className="mt-5">
                       <p className="text-2xl font-extrabold text-green-800 dark:text-green-400">
                         {money(product.price)}
@@ -256,6 +254,7 @@ export default function HomePage() {
                       </p>
                     </div>
 
+                    {/* Product Link */}
                     <Link
                       href={`/products/${product.slug}`}
                       className="mt-5 inline-flex items-center justify-between gap-2 border-t border-slate-100 pt-4 font-bold text-green-800 transition dark:border-white/10 dark:text-green-400"
@@ -311,19 +310,14 @@ export default function HomePage() {
               </p>
 
               <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-                Your Cattle Feed Partner in Rajasthan
+                Product Information Made Simple
               </h2>
 
               <p className="mt-5 leading-8 text-slate-600 dark:text-slate-300">
-                Khaate Peete Pashu helps farmers explore cattle
-                feed, pashu aahar and livestock nutrition
-                products in one place. Based in Haripura,
-                Sangaria, Hanumangarh, Rajasthan, we provide
-                product information and direct enquiry options
-                for customers interested in dairy feed and
-                animal nutrition. Contact our team to learn
-                about product availability, pricing and
-                delivery options.
+                Browse product information in one place. Check
+                available pack sizes, review product details and
+                contact our team to confirm pricing, availability
+                and delivery options.
               </p>
 
               <Link
@@ -368,7 +362,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Contact CTA - Unchanged */}
+      {/* Contact CTA */}
       <section className="bg-white py-16 dark:bg-[#121d16] sm:py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="relative overflow-hidden rounded-3xl bg-[#14291b] p-8 text-white sm:p-12 lg:p-14">
