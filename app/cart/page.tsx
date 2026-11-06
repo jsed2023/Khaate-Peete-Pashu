@@ -60,7 +60,10 @@ export default function CartPage() {
 
   const [customerError, setCustomerError] = useState("");
 
-  const itemCount = items.reduce((sum, item) => sum + item.qty, 0);
+  const itemCount = items.reduce(
+    (sum, item) => sum + item.qty,
+    0
+  );
 
   function updateCustomer<K extends keyof CustomerDetails>(
     field: K,
@@ -78,14 +81,15 @@ export default function CartPage() {
 
   function orderOnWhatsApp() {
     if (!items.length) {
-      setCustomerError("Your cart is empty. Please add a product first.");
+      setCustomerError(
+        "Your cart is empty. Please add a product first."
+      );
       return;
     }
 
-    const whatsappNumber = String(siteConfig.whatsappNumber || "").replace(
-      /\D/g,
-      ""
-    );
+    const whatsappNumber = String(
+      siteConfig.whatsappNumber || ""
+    ).replace(/\D/g, "");
 
     const customerPhone = customer.phone.replace(/\D/g, "");
 
@@ -118,7 +122,9 @@ export default function CartPage() {
     }
 
     if (!/^\d{6}$/.test(customer.pincode.trim())) {
-      setCustomerError("Please enter a valid 6-digit PIN code.");
+      setCustomerError(
+        "Please enter a valid 6-digit PIN code."
+      );
       return;
     }
 
@@ -129,16 +135,18 @@ export default function CartPage() {
       return;
     }
 
+    // Build product details safely for nullable prices.
     const productLines = items.map((item, index) => {
-      const isEnquiry = item.product.price === null;
+      const price = item.product.price;
+      const isEnquiry = price === null;
 
       const productPrice = isEnquiry
         ? item.product.priceLabel || "Price on Enquiry"
-        : money(item.product.price);
+        : money(price);
 
       const itemAmount = isEnquiry
         ? "To be confirmed"
-        : money(item.product.price * item.qty);
+        : money(price * item.qty);
 
       return (
         `${index + 1}. ${item.product.name}\n` +
@@ -187,15 +195,12 @@ export default function CartPage() {
 
     setCustomerError("");
 
-    // Open WhatsApp from the customer's button click.
-    // Keep the cart and customer details intact until the order is confirmed.
-    try {
-      window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-    } catch {
-      setCustomerError(
-        "WhatsApp could not be opened. Please try again."
-      );
-    }
+    // Keep the cart intact until the order is confirmed.
+    window.open(
+      whatsappUrl,
+      "_blank",
+      "noopener,noreferrer"
+    );
   }
 
   if (!hydrated) {
@@ -362,15 +367,16 @@ export default function CartPage() {
 
                 <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
                   {items.map((item) => {
-                    const isEnquiry = item.product.price === null;
+                    const price = item.product.price;
+                    const isEnquiry = price === null;
 
                     const displayPrice = isEnquiry
                       ? item.product.priceLabel || "Price on Enquiry"
-                      : money(item.product.price);
+                      : money(price);
 
                     const itemTotal = isEnquiry
                       ? "To be confirmed"
-                      : money(item.product.price * item.qty);
+                      : money(price * item.qty);
 
                     return (
                       <article
@@ -532,336 +538,315 @@ export default function CartPage() {
               {/* Customer Details and Order Summary */}
               <aside className="lg:sticky lg:top-24">
                 {/* Customer Form */}
-                <div className="mb-5 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-                  <div className="bg-[#173f2d] px-5 py-4 text-white">
-                    <div className="flex items-center gap-3">
-                      <div className="flex size-10 items-center justify-center rounded-xl bg-white/10">
-                        <UserRound size={21} />
-                      </div>
+                <div className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm sm:p-6">
+                  <div className="mb-5 flex items-center gap-3">
+                    <div className="flex size-11 items-center justify-center rounded-xl bg-green-50 text-green-800">
+                      <UserRound size={21} />
+                    </div>
 
-                      <div>
-                        <h2 className="text-lg font-extrabold">
-                          Customer Details
-                        </h2>
-
-                        <p className="mt-1 text-xs text-green-100">
-                          Enter your delivery information
-                        </p>
-                      </div>
+                    <div>
+                      <h2 className="text-lg font-extrabold text-stone-900">
+                        Delivery details
+                      </h2>
+                      <p className="text-xs text-stone-500">
+                        Where should we deliver your order?
+                      </p>
                     </div>
                   </div>
 
-                  <div className="space-y-4 p-5">
+                  <div className="space-y-4">
                     <div>
                       <label
                         htmlFor="customer-name"
-                        className="mb-1.5 block text-sm font-semibold text-stone-700"
+                        className="mb-1.5 block text-xs font-bold text-stone-700"
                       >
-                        Full Name *
+                        Full name *
                       </label>
 
                       <input
                         id="customer-name"
-                        name="name"
                         type="text"
                         autoComplete="name"
-                        maxLength={100}
                         value={customer.name}
-                        onChange={(e) =>
-                          updateCustomer("name", e.target.value)
+                        onChange={(event) =>
+                          updateCustomer("name", event.target.value)
                         }
                         placeholder="Enter your full name"
-                        className="w-full rounded-xl border border-stone-200 px-3.5 py-3 text-sm outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
-                        required
+                        className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-3 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-green-700 focus:bg-white focus:ring-2 focus:ring-green-700/10"
                       />
                     </div>
 
                     <div>
                       <label
                         htmlFor="customer-phone"
-                        className="mb-1.5 block text-sm font-semibold text-stone-700"
+                        className="mb-1.5 block text-xs font-bold text-stone-700"
                       >
-                        Mobile Number *
+                        Mobile number *
                       </label>
 
                       <input
                         id="customer-phone"
-                        name="phone"
                         type="tel"
                         inputMode="numeric"
-                        autoComplete="tel-national"
+                        autoComplete="tel"
                         maxLength={10}
                         value={customer.phone}
-                        onChange={(e) =>
+                        onChange={(event) =>
                           updateCustomer(
                             "phone",
-                            e.target.value.replace(/\D/g, "").slice(0, 10)
+                            event.target.value.replace(/\D/g, "").slice(0, 10)
                           )
                         }
                         placeholder="10-digit mobile number"
-                        className="w-full rounded-xl border border-stone-200 px-3.5 py-3 text-sm outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
-                        required
+                        className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-3 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-green-700 focus:bg-white focus:ring-2 focus:ring-green-700/10"
                       />
                     </div>
 
                     <div>
                       <label
                         htmlFor="customer-address"
-                        className="mb-1.5 block text-sm font-semibold text-stone-700"
+                        className="mb-1.5 block text-xs font-bold text-stone-700"
                       >
-                        Complete Address *
+                        Complete address *
                       </label>
 
                       <textarea
                         id="customer-address"
-                        name="address"
-                        autoComplete="street-address"
-                        maxLength={500}
-                        value={customer.address}
-                        onChange={(e) =>
-                          updateCustomer("address", e.target.value)
-                        }
-                        placeholder="House number, street, village or area"
                         rows={3}
-                        className="w-full resize-y rounded-xl border border-stone-200 px-3.5 py-3 text-sm outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
-                        required
+                        autoComplete="street-address"
+                        value={customer.address}
+                        onChange={(event) =>
+                          updateCustomer("address", event.target.value)
+                        }
+                        placeholder="House number, street, village or locality"
+                        className="w-full resize-none rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-3 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-green-700 focus:bg-white focus:ring-2 focus:ring-green-700/10"
                       />
                     </div>
 
-                    <div>
-                      <label
-                        htmlFor="customer-city"
-                        className="mb-1.5 block text-sm font-semibold text-stone-700"
-                      >
-                        City / Village *
-                      </label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label
+                          htmlFor="customer-city"
+                          className="mb-1.5 block text-xs font-bold text-stone-700"
+                        >
+                          City / Village *
+                        </label>
 
-                      <input
-                        id="customer-city"
-                        name="city"
-                        type="text"
-                        autoComplete="address-level2"
-                        maxLength={100}
-                        value={customer.city}
-                        onChange={(e) =>
-                          updateCustomer("city", e.target.value)
-                        }
-                        placeholder="Enter city or village"
-                        className="w-full rounded-xl border border-stone-200 px-3.5 py-3 text-sm outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
-                        required
-                      />
+                        <input
+                          id="customer-city"
+                          type="text"
+                          autoComplete="address-level2"
+                          value={customer.city}
+                          onChange={(event) =>
+                            updateCustomer("city", event.target.value)
+                          }
+                          placeholder="City"
+                          className="w-full min-w-0 rounded-xl border border-stone-200 bg-stone-50 px-3 py-3 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-green-700 focus:bg-white focus:ring-2 focus:ring-green-700/10"
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="customer-pincode"
+                          className="mb-1.5 block text-xs font-bold text-stone-700"
+                        >
+                          PIN code *
+                        </label>
+
+                        <input
+                          id="customer-pincode"
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="postal-code"
+                          maxLength={6}
+                          value={customer.pincode}
+                          onChange={(event) =>
+                            updateCustomer(
+                              "pincode",
+                              event.target.value.replace(/\D/g, "").slice(0, 6)
+                            )
+                          }
+                          placeholder="6 digits"
+                          className="w-full min-w-0 rounded-xl border border-stone-200 bg-stone-50 px-3 py-3 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-green-700 focus:bg-white focus:ring-2 focus:ring-green-700/10"
+                        />
+                      </div>
                     </div>
 
                     <div>
                       <label
                         htmlFor="customer-state"
-                        className="mb-1.5 block text-sm font-semibold text-stone-700"
+                        className="mb-1.5 block text-xs font-bold text-stone-700"
                       >
                         State *
                       </label>
 
                       <input
                         id="customer-state"
-                        name="state"
                         type="text"
                         autoComplete="address-level1"
-                        maxLength={100}
                         value={customer.state}
-                        onChange={(e) =>
-                          updateCustomer("state", e.target.value)
+                        onChange={(event) =>
+                          updateCustomer("state", event.target.value)
                         }
-                        placeholder="Enter state"
-                        className="w-full rounded-xl border border-stone-200 px-3.5 py-3 text-sm outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
-                        required
-                      />
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="customer-pincode"
-                        className="mb-1.5 block text-sm font-semibold text-stone-700"
-                      >
-                        PIN Code *
-                      </label>
-
-                      <input
-                        id="customer-pincode"
-                        name="pincode"
-                        type="text"
-                        inputMode="numeric"
-                        autoComplete="postal-code"
-                        maxLength={6}
-                        value={customer.pincode}
-                        onChange={(e) =>
-                          updateCustomer(
-                            "pincode",
-                            e.target.value.replace(/\D/g, "").slice(0, 6)
-                          )
-                        }
-                        placeholder="6-digit PIN code"
-                        className="w-full rounded-xl border border-stone-200 px-3.5 py-3 text-sm outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
-                        required
+                        placeholder="State"
+                        className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-3 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-green-700 focus:bg-white focus:ring-2 focus:ring-green-700/10"
                       />
                     </div>
 
                     <div>
                       <label
                         htmlFor="customer-notes"
-                        className="mb-1.5 block text-sm font-semibold text-stone-700"
+                        className="mb-1.5 block text-xs font-bold text-stone-700"
                       >
-                        Additional Notes{" "}
-                        <span className="ml-1 font-normal text-stone-400">
-                          (Optional)
-                        </span>
+                        Additional notes (optional)
                       </label>
 
                       <textarea
                         id="customer-notes"
-                        name="notes"
-                        maxLength={500}
-                        value={customer.notes}
-                        onChange={(e) =>
-                          updateCustomer("notes", e.target.value)
-                        }
-                        placeholder="Landmark or delivery instructions"
                         rows={2}
-                        className="w-full resize-y rounded-xl border border-stone-200 px-3.5 py-3 text-sm outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
+                        value={customer.notes}
+                        onChange={(event) =>
+                          updateCustomer("notes", event.target.value)
+                        }
+                        placeholder="Landmark, delivery instructions, etc."
+                        className="w-full resize-none rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-3 text-sm text-stone-900 outline-none transition placeholder:text-stone-400 focus:border-green-700 focus:bg-white focus:ring-2 focus:ring-green-700/10"
                       />
                     </div>
-
-                    <p className="flex items-start gap-2 text-xs leading-5 text-stone-500">
-                      <MapPin
-                        size={16}
-                        className="mt-0.5 shrink-0 text-green-700"
-                      />
-                      Your delivery details will be included in the WhatsApp
-                      order message.
-                    </p>
-
-                    {customerError && (
-                      <p
-                        role="alert"
-                        aria-live="polite"
-                        className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm leading-6 text-red-700"
-                      >
-                        {customerError}
-                      </p>
-                    )}
                   </div>
                 </div>
 
                 {/* Order Summary */}
-                <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-                  <div className="bg-[#173f2d] px-5 py-5 text-white sm:px-6">
+                <div className="mt-5 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+                  <div className="bg-[#143d2b] px-5 py-5 text-white">
                     <div className="flex items-center gap-3">
-                      <div className="flex size-11 items-center justify-center rounded-xl bg-white/10">
-                        <ShoppingBag size={22} />
+                      <div className="flex size-10 items-center justify-center rounded-xl bg-white/10">
+                        <ShoppingBag size={20} />
                       </div>
 
                       <div>
-                        <h2 className="text-lg font-extrabold">
-                          Order Summary
+                        <h2 className="font-extrabold">
+                          Order summary
                         </h2>
-
-                        <p className="mt-0.5 text-xs text-green-100">
-                          {itemCount} {itemCount === 1 ? "item" : "items"}{" "}
-                          selected
+                        <p className="text-xs text-green-100">
+                          {itemCount} {itemCount === 1 ? "item" : "items"} in
+                          your order
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="p-5 sm:p-6">
-                    <div className="space-y-4">
-                      <div className="flex justify-between gap-4 text-sm">
-                        <span className="text-stone-500">
-                          Known-price subtotal
-                        </span>
-
-                        <span className="font-bold text-stone-900">
-                          {money(subtotal)}
-                        </span>
-                      </div>
-
-                      {hasEnquiryItems && (
-                        <div className="flex justify-between gap-4 text-sm">
-                          <span className="text-stone-500">
-                            Enquiry products
-                          </span>
-
-                          <span className="text-right font-semibold text-amber-700">
-                            Price to be confirmed
-                          </span>
-                        </div>
-                      )}
-
-                      <div className="flex justify-between gap-4 text-sm">
-                        <span className="text-stone-500">Shipping</span>
-
-                        <span className="text-right font-medium text-stone-600">
-                          To be confirmed
-                        </span>
-                      </div>
+                  <div className="space-y-4 p-5">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-stone-500">
+                        Total quantity
+                      </span>
+                      <span className="font-bold text-stone-900">
+                        {itemCount}
+                      </span>
                     </div>
 
-                    <div className="my-5 border-t border-dashed border-stone-200" />
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-stone-500">
+                        Known-price subtotal
+                      </span>
+                      <span className="font-bold text-stone-900">
+                        {money(subtotal)}
+                      </span>
+                    </div>
 
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="font-extrabold text-stone-900">
-                          {hasEnquiryItems
-                            ? "Final Total"
-                            : "Estimated Total"}
-                        </p>
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-stone-500">
+                        Shipping charges
+                      </span>
+                      <span className="font-semibold text-amber-700">
+                        To be confirmed
+                      </span>
+                    </div>
 
-                        <p className="mt-1 text-xs leading-5 text-stone-400">
+                    <div className="border-t border-dashed border-stone-200 pt-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="font-extrabold text-stone-900">
+                            {hasEnquiryItems
+                              ? "Estimated amount"
+                              : "Estimated total"}
+                          </p>
+
+                          <p className="mt-1 max-w-[210px] text-[11px] leading-5 text-stone-500">
+                            {hasEnquiryItems
+                              ? "Enquiry product prices and shipping are not included."
+                              : "Shipping charges are not included."}
+                          </p>
+                        </div>
+
+                        <p className="text-xl font-black text-green-800">
                           {hasEnquiryItems
-                            ? "Product prices and shipping will be confirmed by seller"
-                            : "Shipping not included"}
+                            ? "To confirm"
+                            : money(subtotal)}
                         </p>
                       </div>
-
-                      <p className="text-right text-xl font-black tracking-tight text-green-800 sm:text-2xl">
-                        {hasEnquiryItems
-                          ? "To be confirmed"
-                          : money(subtotal)}
-                      </p>
                     </div>
 
                     {hasEnquiryItems && (
-                      <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3">
+                      <div className="flex gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3">
+                        <MessageCircle
+                          size={17}
+                          className="mt-0.5 shrink-0 text-amber-700"
+                        />
+
                         <p className="text-xs leading-5 text-amber-800">
-                          Your cart contains products with enquiry-based
-                          pricing. The seller will confirm their prices and
-                          your final order amount on WhatsApp.
+                          Your cart contains products with enquiry pricing.
+                          The seller will confirm their prices on WhatsApp.
                         </p>
+                      </div>
+                    )}
+
+                    {customerError && (
+                      <div
+                        role="alert"
+                        className="rounded-xl border border-red-200 bg-red-50 px-3.5 py-3 text-xs font-medium leading-5 text-red-700"
+                      >
+                        {customerError}
                       </div>
                     )}
 
                     <button
                       type="button"
                       onClick={orderOnWhatsApp}
-                      className="mt-6 flex min-h-13 w-full items-center justify-center gap-2 rounded-xl bg-[#168447] px-4 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-green-900/15 transition hover:-translate-y-0.5 hover:bg-[#116b39] focus:outline-none focus:ring-4 focus:ring-green-200"
+                      className="flex min-h-14 w-full items-center justify-center gap-2 rounded-xl bg-green-700 px-5 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-green-900/15 transition hover:-translate-y-0.5 hover:bg-green-800 active:translate-y-0"
                     >
-                      <MessageCircle size={20} />
-                      Order on WhatsApp
+                      <MessageCircle size={19} />
+                      Send order on WhatsApp
                       <ArrowRight size={17} />
                     </button>
 
-                    <p className="mt-4 text-center text-[11px] leading-5 text-stone-400">
-                      Direct seller communication · Order enquiry
-                    </p>
+                    <div className="flex items-start gap-2 text-[11px] leading-5 text-stone-500">
+                      <ShieldCheck
+                        size={15}
+                        className="mt-0.5 shrink-0 text-green-700"
+                      />
+                      Your order request will be shared with the seller.
+                      Final prices, availability, shipping and payment will
+                      be confirmed directly.
+                    </div>
                   </div>
                 </div>
 
-                {/* Help Information */}
-                <div className="mt-4 flex items-center gap-3 rounded-2xl border border-green-100 bg-green-50/80 p-4">
-                  <Leaf size={22} className="shrink-0 text-green-800" />
+                {/* Support Note */}
+                <div className="mt-4 flex items-center gap-3 rounded-2xl border border-green-100 bg-green-50 p-4">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-white text-green-800">
+                    <MapPin size={19} />
+                  </div>
 
-                  <p className="text-xs leading-5 text-green-900">
-                    Need help choosing a product? Contact the seller before
-                    confirming your order.
-                  </p>
+                  <div>
+                    <p className="text-xs font-bold text-green-900">
+                      Need help with your order?
+                    </p>
+                    <p className="mt-0.5 text-[11px] leading-5 text-green-800">
+                      Contact us on WhatsApp for product and delivery
+                      assistance.
+                    </p>
+                  </div>
                 </div>
               </aside>
             </div>
