@@ -45,10 +45,19 @@ const initialCustomer: CustomerDetails = {
 };
 
 export default function CartPage() {
-  const { items, subtotal, remove, change, clear, hydrated } = useCart();
+  const {
+    items,
+    subtotal,
+    hasEnquiryItems,
+    remove,
+    change,
+    clear,
+    hydrated,
+  } = useCart();
 
   const [customer, setCustomer] =
     useState<CustomerDetails>({ ...initialCustomer });
+
   const [customerError, setCustomerError] = useState("");
 
   const itemCount = items.reduce((sum, item) => sum + item.qty, 0);
@@ -73,7 +82,11 @@ export default function CartPage() {
       return;
     }
 
-    const whatsappNumber = siteConfig.whatsappNumber.replace(/\D/g, "");
+    const whatsappNumber = String(siteConfig.whatsappNumber || "").replace(
+      /\D/g,
+      ""
+    );
+
     const customerPhone = customer.phone.replace(/\D/g, "");
 
     if (!whatsappNumber) {
@@ -116,15 +129,26 @@ export default function CartPage() {
       return;
     }
 
-    const productLines = items.map(
-      (item, index) =>
+    const productLines = items.map((item, index) => {
+      const isEnquiry = item.product.price === null;
+
+      const productPrice = isEnquiry
+        ? item.product.priceLabel || "Price on Enquiry"
+        : money(item.product.price);
+
+      const itemAmount = isEnquiry
+        ? "To be confirmed"
+        : money(item.product.price * item.qty);
+
+      return (
         `${index + 1}. ${item.product.name}\n` +
         `Category: ${item.product.category}\n` +
         `Pack size: ${item.product.unit}\n` +
         `Quantity: ${item.qty}\n` +
-        `Price: ${money(item.product.price)} each\n` +
-        `Amount: ${money(item.product.price * item.qty)}`
-    );
+        `Price: ${productPrice} each\n` +
+        `Amount: ${itemAmount}`
+      );
+    });
 
     const message = [
       `Namaste ${siteConfig.name}!`,
@@ -146,11 +170,14 @@ export default function CartPage() {
       ...productLines,
       "",
       `Total quantity: ${itemCount}`,
-      `Subtotal: ${money(subtotal)}`,
+      `Known-price subtotal: ${money(subtotal)}`,
+      `Enquiry products included: ${hasEnquiryItems ? "Yes" : "No"}`,
       "Shipping charges: To be confirmed",
-      `Estimated total before shipping: ${money(subtotal)}`,
+      hasEnquiryItems
+        ? "Final product price and total: To be confirmed by seller"
+        : `Estimated total before shipping: ${money(subtotal)}`,
       "",
-      "Please confirm product availability, final price, delivery charges and payment details.",
+      "Please confirm product availability, enquiry product prices, final order amount, delivery charges and payment details.",
       "",
       "Thank you!",
     ].join("\n");
@@ -160,17 +187,13 @@ export default function CartPage() {
 
     setCustomerError("");
 
+    // Open WhatsApp from the customer's button click.
+    // Keep the cart and customer details intact until the order is confirmed.
     try {
-      // WhatsApp open karne ki request user ke button click se hoti hai.
       window.open(whatsappUrl, "_blank", "noopener,noreferrer");
-
-      // Order message banne ke baad cart aur form clear karein.
-      clear();
-      setCustomer({ ...initialCustomer });
-      setCustomerError("");
     } catch {
       setCustomerError(
-        "WhatsApp open nahi ho saka. Please dobara try karein."
+        "WhatsApp could not be opened. Please try again."
       );
     }
   }
@@ -180,6 +203,7 @@ export default function CartPage() {
       <main className="min-h-screen bg-stone-50 px-4 py-16">
         <div className="mx-auto max-w-6xl animate-pulse">
           <div className="h-8 w-48 rounded-lg bg-stone-200" />
+
           <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_380px]">
             <div className="h-80 rounded-3xl bg-white" />
             <div className="h-96 rounded-3xl bg-white" />
@@ -191,6 +215,7 @@ export default function CartPage() {
 
   return (
     <main className="min-h-screen bg-[#f7f8f2]">
+      {/* Hero Section */}
       <section className="relative isolate overflow-hidden bg-[#143d2b] text-white">
         <div className="absolute -right-16 -top-28 -z-10 size-80 rounded-full bg-lime-400/10 blur-3xl" />
         <div className="absolute -bottom-28 left-1/3 -z-10 size-72 rounded-full bg-emerald-300/10 blur-3xl" />
@@ -218,10 +243,13 @@ export default function CartPage() {
                 <div className="flex size-11 items-center justify-center rounded-xl bg-lime-300 text-green-950">
                   <ShoppingBag size={22} />
                 </div>
+
                 <div>
                   <p className="text-2xl font-bold">{itemCount}</p>
                   <p className="text-xs text-green-100">
-                    {itemCount === 1 ? "Item in your cart" : "Items in your cart"}
+                    {itemCount === 1
+                      ? "Item in your cart"
+                      : "Items in your cart"}
                   </p>
                 </div>
               </div>
@@ -230,6 +258,7 @@ export default function CartPage() {
         </div>
       </section>
 
+      {/* Cart Content */}
       <section className="px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         <div className="mx-auto max-w-7xl">
           {!items.length ? (
@@ -285,9 +314,14 @@ export default function CartPage() {
                     className="flex items-center gap-3 border-b border-stone-100 px-5 py-4 last:border-0 sm:justify-center sm:border-b-0 sm:border-r sm:last:border-r-0"
                   >
                     <Icon size={20} className="shrink-0 text-green-800" />
+
                     <div>
-                      <p className="text-sm font-bold text-stone-800">{title}</p>
-                      <p className="mt-0.5 text-xs text-stone-500">{text}</p>
+                      <p className="text-sm font-bold text-stone-800">
+                        {title}
+                      </p>
+                      <p className="mt-0.5 text-xs text-stone-500">
+                        {text}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -295,12 +329,14 @@ export default function CartPage() {
             </div>
           ) : (
             <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_390px] xl:gap-8">
+              {/* Product List */}
               <div className="min-w-0">
                 <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <h2 className="text-xl font-extrabold text-stone-900 sm:text-2xl">
                       Your selected products
                     </h2>
+
                     <p className="mt-1 text-sm text-stone-500">
                       Check quantities before placing your order.
                     </p>
@@ -309,7 +345,11 @@ export default function CartPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      if (window.confirm("Are you sure you want to clear your cart?")) {
+                      if (
+                        window.confirm(
+                          "Are you sure you want to clear your cart?"
+                        )
+                      ) {
                         clear();
                       }
                     }}
@@ -321,91 +361,126 @@ export default function CartPage() {
                 </div>
 
                 <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
-                  {items.map((item) => (
-                    <article
-                      key={item.product.id}
-                      className="group border-b border-stone-100 p-4 last:border-b-0 sm:p-6"
-                    >
-                      <div className="flex gap-4 sm:gap-5">
-                        <Link
-                          href={`/products/${item.product.slug}`}
-                          aria-label={`View ${item.product.name}`}
-                          className="flex size-24 shrink-0 items-center justify-center rounded-2xl border border-green-100 bg-gradient-to-br from-green-50 to-lime-50 text-4xl transition group-hover:border-green-200 sm:size-28 sm:text-5xl"
-                        >
-                          {item.product.emoji}
-                        </Link>
+                  {items.map((item) => {
+                    const isEnquiry = item.product.price === null;
 
-                        <div className="min-w-0 flex-1">
-                          <span className="inline-flex rounded-full bg-green-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-green-800">
-                            {item.product.category}
-                          </span>
+                    const displayPrice = isEnquiry
+                      ? item.product.priceLabel || "Price on Enquiry"
+                      : money(item.product.price);
 
+                    const itemTotal = isEnquiry
+                      ? "To be confirmed"
+                      : money(item.product.price * item.qty);
+
+                    return (
+                      <article
+                        key={item.product.id}
+                        className="group border-b border-stone-100 p-4 last:border-b-0 sm:p-6"
+                      >
+                        <div className="flex gap-4 sm:gap-5">
                           <Link
                             href={`/products/${item.product.slug}`}
-                            className="mt-2 block text-base font-extrabold leading-snug text-stone-900 transition hover:text-green-800 sm:text-lg"
+                            aria-label={`View ${item.product.name}`}
+                            className="flex size-24 shrink-0 items-center justify-center rounded-2xl border border-green-100 bg-gradient-to-br from-green-50 to-lime-50 text-4xl transition group-hover:border-green-200 sm:size-28 sm:text-5xl"
                           >
-                            {item.product.name}
+                            {item.product.emoji}
                           </Link>
 
-                          <p className="mt-1 text-xs text-stone-500 sm:text-sm">
-                            Pack size: {item.product.unit}
-                          </p>
+                          <div className="min-w-0 flex-1">
+                            <span className="inline-flex rounded-full bg-green-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-green-800">
+                              {item.product.category}
+                            </span>
 
-                          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-                            <span className="text-sm font-bold text-green-800">
-                              {money(item.product.price)}
-                              <span className="ml-1 font-normal text-stone-400">/ unit</span>
+                            <Link
+                              href={`/products/${item.product.slug}`}
+                              className="mt-2 block text-base font-extrabold leading-snug text-stone-900 transition hover:text-green-800 sm:text-lg"
+                            >
+                              {item.product.name}
+                            </Link>
+
+                            <p className="mt-1 text-xs text-stone-500 sm:text-sm">
+                              Pack size: {item.product.unit}
+                            </p>
+
+                            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+                              <span
+                                className={`text-sm font-bold ${
+                                  isEnquiry
+                                    ? "text-amber-700"
+                                    : "text-green-800"
+                                }`}
+                              >
+                                {displayPrice}
+
+                                {!isEnquiry && (
+                                  <span className="ml-1 font-normal text-stone-400">
+                                    / unit
+                                  </span>
+                                )}
+                              </span>
+
+                              <button
+                                type="button"
+                                onClick={() => remove(item.product.id)}
+                                className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-400 transition hover:text-red-600"
+                              >
+                                <Trash2 size={13} />
+                                Remove
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Item Total and Quantity */}
+                        <div className="mt-5 flex items-center justify-between gap-3 rounded-xl bg-stone-50 px-3 py-3 sm:ml-[132px] sm:mt-4 sm:px-4">
+                          <div>
+                            <p className="text-[11px] font-medium uppercase tracking-wider text-stone-400">
+                              Item total
+                            </p>
+
+                            <p
+                              className={`mt-0.5 text-lg font-extrabold ${
+                                isEnquiry
+                                  ? "text-amber-700"
+                                  : "text-stone-900"
+                              }`}
+                            >
+                              {itemTotal}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center gap-3 rounded-xl border border-stone-200 bg-white p-1">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                change(item.product.id, item.qty - 1)
+                              }
+                              disabled={item.qty <= 1}
+                              aria-label={`Decrease quantity of ${item.product.name}`}
+                              className="flex size-9 items-center justify-center rounded-lg text-stone-700 transition hover:bg-green-50 hover:text-green-800 disabled:cursor-not-allowed disabled:opacity-35"
+                            >
+                              <Minus size={15} />
+                            </button>
+
+                            <span className="min-w-5 text-center text-sm font-extrabold tabular-nums">
+                              {item.qty}
                             </span>
 
                             <button
                               type="button"
-                              onClick={() => remove(item.product.id)}
-                              className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-400 transition hover:text-red-600"
+                              onClick={() =>
+                                change(item.product.id, item.qty + 1)
+                              }
+                              aria-label={`Increase quantity of ${item.product.name}`}
+                              className="flex size-9 items-center justify-center rounded-lg text-stone-700 transition hover:bg-green-50 hover:text-green-800"
                             >
-                              <Trash2 size={13} />
-                              Remove
+                              <Plus size={15} />
                             </button>
                           </div>
                         </div>
-                      </div>
-
-                      <div className="mt-5 flex items-center justify-between gap-3 rounded-xl bg-stone-50 px-3 py-3 sm:ml-[132px] sm:mt-4 sm:px-4">
-                        <div>
-                          <p className="text-[11px] font-medium uppercase tracking-wider text-stone-400">
-                            Item total
-                          </p>
-                          <p className="mt-0.5 text-lg font-extrabold text-stone-900">
-                            {money(item.product.price * item.qty)}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center gap-3 rounded-xl border border-stone-200 bg-white p-1">
-                          <button
-                            type="button"
-                            onClick={() => change(item.product.id, item.qty - 1)}
-                            disabled={item.qty <= 1}
-                            aria-label={`Decrease quantity of ${item.product.name}`}
-                            className="flex size-9 items-center justify-center rounded-lg text-stone-700 transition hover:bg-green-50 hover:text-green-800 disabled:cursor-not-allowed disabled:opacity-35"
-                          >
-                            <Minus size={15} />
-                          </button>
-
-                          <span className="min-w-5 text-center text-sm font-extrabold tabular-nums">
-                            {item.qty}
-                          </span>
-
-                          <button
-                            type="button"
-                            onClick={() => change(item.product.id, item.qty + 1)}
-                            aria-label={`Increase quantity of ${item.product.name}`}
-                            className="flex size-9 items-center justify-center rounded-lg text-stone-700 transition hover:bg-green-50 hover:text-green-800"
-                          >
-                            <Plus size={15} />
-                          </button>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
+                      </article>
+                    );
+                  })}
                 </div>
 
                 <Link
@@ -416,15 +491,21 @@ export default function CartPage() {
                   Continue shopping
                 </Link>
 
+                {/* Delivery Information */}
                 <div className="mt-6 grid gap-3 sm:grid-cols-2">
                   <div className="flex gap-3 rounded-2xl border border-stone-200 bg-white p-4">
                     <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-800">
                       <Truck size={20} />
                     </div>
+
                     <div>
-                      <p className="text-sm font-bold text-stone-800">Delivery details</p>
+                      <p className="text-sm font-bold text-stone-800">
+                        Delivery details
+                      </p>
+
                       <p className="mt-1 text-xs leading-5 text-stone-500">
-                        Shipping charges and delivery availability will be confirmed by the seller.
+                        Shipping charges and delivery availability will be
+                        confirmed by the seller.
                       </p>
                     </div>
                   </div>
@@ -433,35 +514,52 @@ export default function CartPage() {
                     <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-700">
                       <PackageCheck size={20} />
                     </div>
+
                     <div>
-                      <p className="text-sm font-bold text-stone-800">Order confirmation</p>
+                      <p className="text-sm font-bold text-stone-800">
+                        Order confirmation
+                      </p>
+
                       <p className="mt-1 text-xs leading-5 text-stone-500">
-                        Confirm stock, final price and payment details before purchase.
+                        Confirm stock, final price and payment details before
+                        purchase.
                       </p>
                     </div>
                   </div>
                 </div>
               </div>
 
+              {/* Customer Details and Order Summary */}
               <aside className="lg:sticky lg:top-24">
+                {/* Customer Form */}
                 <div className="mb-5 overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
                   <div className="bg-[#173f2d] px-5 py-4 text-white">
                     <div className="flex items-center gap-3">
                       <div className="flex size-10 items-center justify-center rounded-xl bg-white/10">
                         <UserRound size={21} />
                       </div>
+
                       <div>
-                        <h2 className="text-lg font-extrabold">Customer Details</h2>
-                        <p className="mt-1 text-xs text-green-100">Enter your delivery information</p>
+                        <h2 className="text-lg font-extrabold">
+                          Customer Details
+                        </h2>
+
+                        <p className="mt-1 text-xs text-green-100">
+                          Enter your delivery information
+                        </p>
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-4 p-5">
                     <div>
-                      <label htmlFor="customer-name" className="mb-1.5 block text-sm font-semibold text-stone-700">
+                      <label
+                        htmlFor="customer-name"
+                        className="mb-1.5 block text-sm font-semibold text-stone-700"
+                      >
                         Full Name *
                       </label>
+
                       <input
                         id="customer-name"
                         name="name"
@@ -469,7 +567,9 @@ export default function CartPage() {
                         autoComplete="name"
                         maxLength={100}
                         value={customer.name}
-                        onChange={(e) => updateCustomer("name", e.target.value)}
+                        onChange={(e) =>
+                          updateCustomer("name", e.target.value)
+                        }
                         placeholder="Enter your full name"
                         className="w-full rounded-xl border border-stone-200 px-3.5 py-3 text-sm outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
                         required
@@ -477,9 +577,13 @@ export default function CartPage() {
                     </div>
 
                     <div>
-                      <label htmlFor="customer-phone" className="mb-1.5 block text-sm font-semibold text-stone-700">
+                      <label
+                        htmlFor="customer-phone"
+                        className="mb-1.5 block text-sm font-semibold text-stone-700"
+                      >
                         Mobile Number *
                       </label>
+
                       <input
                         id="customer-phone"
                         name="phone"
@@ -488,7 +592,12 @@ export default function CartPage() {
                         autoComplete="tel-national"
                         maxLength={10}
                         value={customer.phone}
-                        onChange={(e) => updateCustomer("phone", e.target.value.replace(/\D/g, "").slice(0, 10))}
+                        onChange={(e) =>
+                          updateCustomer(
+                            "phone",
+                            e.target.value.replace(/\D/g, "").slice(0, 10)
+                          )
+                        }
                         placeholder="10-digit mobile number"
                         className="w-full rounded-xl border border-stone-200 px-3.5 py-3 text-sm outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
                         required
@@ -496,16 +605,22 @@ export default function CartPage() {
                     </div>
 
                     <div>
-                      <label htmlFor="customer-address" className="mb-1.5 block text-sm font-semibold text-stone-700">
+                      <label
+                        htmlFor="customer-address"
+                        className="mb-1.5 block text-sm font-semibold text-stone-700"
+                      >
                         Complete Address *
                       </label>
+
                       <textarea
                         id="customer-address"
                         name="address"
                         autoComplete="street-address"
                         maxLength={500}
                         value={customer.address}
-                        onChange={(e) => updateCustomer("address", e.target.value)}
+                        onChange={(e) =>
+                          updateCustomer("address", e.target.value)
+                        }
                         placeholder="House number, street, village or area"
                         rows={3}
                         className="w-full resize-y rounded-xl border border-stone-200 px-3.5 py-3 text-sm outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
@@ -514,9 +629,13 @@ export default function CartPage() {
                     </div>
 
                     <div>
-                      <label htmlFor="customer-city" className="mb-1.5 block text-sm font-semibold text-stone-700">
+                      <label
+                        htmlFor="customer-city"
+                        className="mb-1.5 block text-sm font-semibold text-stone-700"
+                      >
                         City / Village *
                       </label>
+
                       <input
                         id="customer-city"
                         name="city"
@@ -524,7 +643,9 @@ export default function CartPage() {
                         autoComplete="address-level2"
                         maxLength={100}
                         value={customer.city}
-                        onChange={(e) => updateCustomer("city", e.target.value)}
+                        onChange={(e) =>
+                          updateCustomer("city", e.target.value)
+                        }
                         placeholder="Enter city or village"
                         className="w-full rounded-xl border border-stone-200 px-3.5 py-3 text-sm outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
                         required
@@ -532,9 +653,13 @@ export default function CartPage() {
                     </div>
 
                     <div>
-                      <label htmlFor="customer-state" className="mb-1.5 block text-sm font-semibold text-stone-700">
+                      <label
+                        htmlFor="customer-state"
+                        className="mb-1.5 block text-sm font-semibold text-stone-700"
+                      >
                         State *
                       </label>
+
                       <input
                         id="customer-state"
                         name="state"
@@ -542,7 +667,9 @@ export default function CartPage() {
                         autoComplete="address-level1"
                         maxLength={100}
                         value={customer.state}
-                        onChange={(e) => updateCustomer("state", e.target.value)}
+                        onChange={(e) =>
+                          updateCustomer("state", e.target.value)
+                        }
                         placeholder="Enter state"
                         className="w-full rounded-xl border border-stone-200 px-3.5 py-3 text-sm outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
                         required
@@ -550,9 +677,13 @@ export default function CartPage() {
                     </div>
 
                     <div>
-                      <label htmlFor="customer-pincode" className="mb-1.5 block text-sm font-semibold text-stone-700">
+                      <label
+                        htmlFor="customer-pincode"
+                        className="mb-1.5 block text-sm font-semibold text-stone-700"
+                      >
                         PIN Code *
                       </label>
+
                       <input
                         id="customer-pincode"
                         name="pincode"
@@ -561,7 +692,12 @@ export default function CartPage() {
                         autoComplete="postal-code"
                         maxLength={6}
                         value={customer.pincode}
-                        onChange={(e) => updateCustomer("pincode", e.target.value.replace(/\D/g, "").slice(0, 6))}
+                        onChange={(e) =>
+                          updateCustomer(
+                            "pincode",
+                            e.target.value.replace(/\D/g, "").slice(0, 6)
+                          )
+                        }
                         placeholder="6-digit PIN code"
                         className="w-full rounded-xl border border-stone-200 px-3.5 py-3 text-sm outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
                         required
@@ -569,15 +705,24 @@ export default function CartPage() {
                     </div>
 
                     <div>
-                      <label htmlFor="customer-notes" className="mb-1.5 block text-sm font-semibold text-stone-700">
-                        Additional Notes <span className="ml-1 font-normal text-stone-400">(Optional)</span>
+                      <label
+                        htmlFor="customer-notes"
+                        className="mb-1.5 block text-sm font-semibold text-stone-700"
+                      >
+                        Additional Notes{" "}
+                        <span className="ml-1 font-normal text-stone-400">
+                          (Optional)
+                        </span>
                       </label>
+
                       <textarea
                         id="customer-notes"
                         name="notes"
                         maxLength={500}
                         value={customer.notes}
-                        onChange={(e) => updateCustomer("notes", e.target.value)}
+                        onChange={(e) =>
+                          updateCustomer("notes", e.target.value)
+                        }
                         placeholder="Landmark or delivery instructions"
                         rows={2}
                         className="w-full resize-y rounded-xl border border-stone-200 px-3.5 py-3 text-sm outline-none transition focus:border-green-700 focus:ring-2 focus:ring-green-100"
@@ -585,28 +730,42 @@ export default function CartPage() {
                     </div>
 
                     <p className="flex items-start gap-2 text-xs leading-5 text-stone-500">
-                      <MapPin size={16} className="mt-0.5 shrink-0 text-green-700" />
-                      Your delivery details will be included in the WhatsApp order message.
+                      <MapPin
+                        size={16}
+                        className="mt-0.5 shrink-0 text-green-700"
+                      />
+                      Your delivery details will be included in the WhatsApp
+                      order message.
                     </p>
 
                     {customerError && (
-                      <p role="alert" aria-live="polite" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm leading-6 text-red-700">
+                      <p
+                        role="alert"
+                        aria-live="polite"
+                        className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm leading-6 text-red-700"
+                      >
                         {customerError}
                       </p>
                     )}
                   </div>
                 </div>
 
+                {/* Order Summary */}
                 <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
                   <div className="bg-[#173f2d] px-5 py-5 text-white sm:px-6">
                     <div className="flex items-center gap-3">
                       <div className="flex size-11 items-center justify-center rounded-xl bg-white/10">
                         <ShoppingBag size={22} />
                       </div>
+
                       <div>
-                        <h2 className="text-lg font-extrabold">Order Summary</h2>
+                        <h2 className="text-lg font-extrabold">
+                          Order Summary
+                        </h2>
+
                         <p className="mt-0.5 text-xs text-green-100">
-                          {itemCount} {itemCount === 1 ? "item" : "items"} selected
+                          {itemCount} {itemCount === 1 ? "item" : "items"}{" "}
+                          selected
                         </p>
                       </div>
                     </div>
@@ -615,13 +774,33 @@ export default function CartPage() {
                   <div className="p-5 sm:p-6">
                     <div className="space-y-4">
                       <div className="flex justify-between gap-4 text-sm">
-                        <span className="text-stone-500">Subtotal</span>
-                        <span className="font-bold text-stone-900">{money(subtotal)}</span>
+                        <span className="text-stone-500">
+                          Known-price subtotal
+                        </span>
+
+                        <span className="font-bold text-stone-900">
+                          {money(subtotal)}
+                        </span>
                       </div>
+
+                      {hasEnquiryItems && (
+                        <div className="flex justify-between gap-4 text-sm">
+                          <span className="text-stone-500">
+                            Enquiry products
+                          </span>
+
+                          <span className="text-right font-semibold text-amber-700">
+                            Price to be confirmed
+                          </span>
+                        </div>
+                      )}
 
                       <div className="flex justify-between gap-4 text-sm">
                         <span className="text-stone-500">Shipping</span>
-                        <span className="text-right font-medium text-stone-600">To be confirmed</span>
+
+                        <span className="text-right font-medium text-stone-600">
+                          To be confirmed
+                        </span>
                       </div>
                     </div>
 
@@ -629,13 +808,35 @@ export default function CartPage() {
 
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="font-extrabold text-stone-900">Estimated Total</p>
-                        <p className="mt-1 text-xs leading-5 text-stone-400">Shipping not included</p>
+                        <p className="font-extrabold text-stone-900">
+                          {hasEnquiryItems
+                            ? "Final Total"
+                            : "Estimated Total"}
+                        </p>
+
+                        <p className="mt-1 text-xs leading-5 text-stone-400">
+                          {hasEnquiryItems
+                            ? "Product prices and shipping will be confirmed by seller"
+                            : "Shipping not included"}
+                        </p>
                       </div>
-                      <p className="text-xl font-black tracking-tight text-green-800 sm:text-2xl">
-                        {money(subtotal)}
+
+                      <p className="text-right text-xl font-black tracking-tight text-green-800 sm:text-2xl">
+                        {hasEnquiryItems
+                          ? "To be confirmed"
+                          : money(subtotal)}
                       </p>
                     </div>
+
+                    {hasEnquiryItems && (
+                      <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-3">
+                        <p className="text-xs leading-5 text-amber-800">
+                          Your cart contains products with enquiry-based
+                          pricing. The seller will confirm their prices and
+                          your final order amount on WhatsApp.
+                        </p>
+                      </div>
+                    )}
 
                     <button
                       type="button"
@@ -653,10 +854,13 @@ export default function CartPage() {
                   </div>
                 </div>
 
+                {/* Help Information */}
                 <div className="mt-4 flex items-center gap-3 rounded-2xl border border-green-100 bg-green-50/80 p-4">
                   <Leaf size={22} className="shrink-0 text-green-800" />
+
                   <p className="text-xs leading-5 text-green-900">
-                    Need help choosing a product? Contact the seller before confirming your order.
+                    Need help choosing a product? Contact the seller before
+                    confirming your order.
                   </p>
                 </div>
               </aside>
