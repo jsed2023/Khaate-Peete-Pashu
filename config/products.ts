@@ -3,7 +3,7 @@ export type Product = {
   slug: string;
   name: string;
   category: string;
-  price: number;
+  price: number | null;
   unit: string;
   emoji: string;
   image: string;
