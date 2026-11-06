@@ -3,7 +3,7 @@ export type Product = {
   slug: string;
   name: string;
   category: string;
-  price: number | null;
+  price: number;
   unit: string;
   emoji: string;
   image: string;
@@ -21,8 +21,7 @@ export const products: Product[] = [
   "slug": "binola-khal",
   "name": "Binola Khal",
   "category": "Cattle Feed",
-  "price": null,
-  "priceLabel": "Price on Enquiry",
+  "price": "Price on Enquiry",
   "unit": "50 kg bag",
   "emoji": "🌾",
   "image": "/images/products/binola-khal.webp",
