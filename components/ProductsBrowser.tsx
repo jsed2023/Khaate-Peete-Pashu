@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useMemo, useState } from "react";
@@ -20,28 +21,46 @@ export default function ProductsBrowser() {
         product.name,
         product.description,
         product.category,
+        product.tag,
+        ...product.details,
         ...product.keywords,
+        ...(product.priceLabel ? [product.priceLabel] : []),
       ]
         .join(" ")
         .toLowerCase();
 
-      return !searchTerm || searchableText.includes(searchTerm);
+      return (
+        !searchTerm || searchableText.includes(searchTerm)
+      );
     });
 
     return [...result].sort((a, b) => {
+      // Featured products first
+      if (sort === "featured") {
+        return (
+          Number(b.featured.length > 0) -
+          Number(a.featured.length > 0)
+        );
+      }
+
+      // Products with prices come before enquiry products
       if (sort === "low") {
+        if (a.price === null && b.price === null) return 0;
+        if (a.price === null) return 1;
+        if (b.price === null) return -1;
+
         return a.price - b.price;
       }
 
       if (sort === "high") {
+        if (a.price === null && b.price === null) return 0;
+        if (a.price === null) return 1;
+        if (b.price === null) return -1;
+
         return b.price - a.price;
       }
 
-      // Featured products first
-      return (
-        Number(b.featured.length > 0) -
-        Number(a.featured.length > 0)
-      );
+      return 0;
     });
   }, [query, sort]);
 
@@ -108,6 +127,7 @@ export default function ProductsBrowser() {
           }}
           aria-hidden="true"
         />
+
         Showing {filtered.length} products
       </p>
 
@@ -115,7 +135,10 @@ export default function ProductsBrowser() {
       {filtered.length > 0 ? (
         <div className="product-grid">
           {filtered.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product.id}
+              product={product}
+            />
           ))}
         </div>
       ) : (
