@@ -20,7 +20,7 @@ export const products: Product[] = [
   "id": "p1",
   "slug": "binola-khal",
   "name": "Binola Khal",
-  category": "Cattle Feed",
+  "category": "Cattle Feed",
   "price": null,
   "priceLabel": "Price on Enquiry",
   "unit": "50 kg bag",
