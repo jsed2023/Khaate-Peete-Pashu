@@ -25,6 +25,8 @@ type CartCtx = {
   count: number;
   subtotal: number;
   hydrated: boolean;
+  hasEnquiryItems: boolean;
+  enquiryItems: CartItem[];
   add: (product: Product) => void;
   remove: (id: string) => void;
   change: (id: string, qty: number) => void;
@@ -38,9 +40,11 @@ const Context = createContext<CartCtx | null>(null);
 function restoreCart(): CartItem[] {
   try {
     const raw = localStorage.getItem(CART_KEY);
+
     if (!raw) return [];
 
     const parsed: unknown = JSON.parse(raw);
+
     if (!Array.isArray(parsed)) return [];
 
     const restored: CartItem[] = [];
@@ -62,12 +66,16 @@ function restoreCart(): CartItem[] {
         continue;
       }
 
+      // Always use the latest product data from config.
       const product = activeProducts.find(
         (p) => p.id === item.product.id
       );
 
       if (product) {
-        restored.push({ product, qty: item.qty });
+        restored.push({
+          product,
+          qty: item.qty,
+        });
       }
     }
 
@@ -85,27 +93,47 @@ export function CartProvider({
   const [items, setItems] = useState<CartItem[]>([]);
   const [hydrated, setHydrated] = useState(false);
 
+  // Restore cart from browser storage.
   useEffect(() => {
     const savedItems = restoreCart();
 
-    // Restore browser-only state after mounting.
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setItems(savedItems);
     setHydrated(true);
   }, []);
 
+  // Save cart whenever items change.
   useEffect(() => {
     if (!hydrated) return;
 
     try {
-      localStorage.setItem(CART_KEY, JSON.stringify(items));
+      localStorage.setItem(
+        CART_KEY,
+        JSON.stringify(items)
+      );
     } catch {
       // Browser storage may be unavailable.
     }
   }, [items, hydrated]);
 
-  const value = useMemo<CartCtx>(
-    () => ({
+  const value = useMemo<CartCtx>(() => {
+    // Products whose prices need confirmation.
+    const enquiryItems = items.filter(
+      (item) => item.product.price === null
+    );
+
+    // Calculate subtotal using only fixed-price products.
+    const subtotal = items.reduce((total, item) => {
+      const price = item.product.price;
+
+      if (price === null) {
+        return total;
+      }
+
+      return total + price * item.qty;
+    }, 0);
+
+    return {
       items,
       hydrated,
 
@@ -114,11 +142,11 @@ export function CartProvider({
         0
       ),
 
-      subtotal: items.reduce(
-        (total, item) =>
-          total + item.product.price * item.qty,
-        0
-      ),
+      subtotal,
+
+      hasEnquiryItems: enquiryItems.length > 0,
+
+      enquiryItems,
 
       add: (product: Product) => {
         setItems((current) => {
@@ -129,18 +157,29 @@ export function CartProvider({
           if (existing) {
             return current.map((item) =>
               item.product.id === product.id
-                ? { ...item, qty: item.qty + 1 }
+                ? {
+                    ...item,
+                    qty: item.qty + 1,
+                  }
                 : item
             );
           }
 
-          return [...current, { product, qty: 1 }];
+          return [
+            ...current,
+            {
+              product,
+              qty: 1,
+            },
+          ];
         });
       },
 
       remove: (id: string) => {
         setItems((current) =>
-          current.filter((item) => item.product.id !== id)
+          current.filter(
+            (item) => item.product.id !== id
+          )
         );
       },
 
@@ -158,16 +197,20 @@ export function CartProvider({
 
           return current.map((item) =>
             item.product.id === id
-              ? { ...item, qty: safeQty }
+              ? {
+                  ...item,
+                  qty: safeQty,
+                }
               : item
           );
         });
       },
 
-      clear: () => setItems([]),
-    }),
-    [items, hydrated]
-  );
+      clear: () => {
+        setItems([]);
+      },
+    };
+  }, [items, hydrated]);
 
   return (
     <Context.Provider value={value}>
