@@ -409,4 +409,3 @@ export function money(amount: number | null): string {
     maximumFractionDigits: 0,
   }).format(amount);
 }
-}
