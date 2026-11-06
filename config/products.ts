@@ -3,7 +3,8 @@ export type Product = {
   slug: string;
   name: string;
   category: string;
-  price: number;
+  price: number | null;
+  priceLabel?: string;
   unit: string;
   emoji: string;
   image: string;
@@ -21,7 +22,8 @@ export const products: Product[] = [
   "slug": "binola-khal",
   "name": "Binola Khal",
   "category": "Cattle Feed",
-  "price": "Price on Enquiry",
+  price: null,
+  priceLabel: "Price on Enquiry",
   "unit": "50 kg bag",
   "emoji": "🌾",
   "image": "/images/products/binola-khal.webp",
@@ -396,10 +398,15 @@ export function getProductSEO(slug: string) {
   };
 }
 
-export function money(amount: number): string {
+export function money(amount: number | null): string {
+  if (amount === null) {
+    return "Price on Enquiry";
+  }
+
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
     maximumFractionDigits: 0,
   }).format(amount);
+}
 }
